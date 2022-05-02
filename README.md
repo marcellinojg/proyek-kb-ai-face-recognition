@@ -17,3 +17,6 @@ EXTENSIONS
 
     **pip install face_recognition**
   
+  
+Proposal (-)
+https://docs.google.com/document/d/1oKBwa_YL_N4fl5hrAAqfU7w31eaie5s6BoYnW8VzPt8/edit?usp=sharing
