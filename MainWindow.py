@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog,QWidget
+from PyQt5.QtCore import (QThread,pyqtSignal)
 from FaceRecognition import Face
 import numpy
 import os
@@ -52,6 +53,7 @@ class Ui_MainWindow(QWidget):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         
+        
         self.uploadButton.clicked.connect(self.openFileNameDialog)
         self.detectButton.clicked.connect(self.detectFace)
         self.addNewPerson.clicked.connect(self.confirmAdd)
@@ -81,15 +83,17 @@ class Ui_MainWindow(QWidget):
         print(listPeople)
         print(personName)
         if not personName in listPeople:    
-            self.createNewPerson()
-            self.output.setText(personName + " has been Added!")
-            self.lineEdit.setDisabled(True)
-            self.lineEdit.setText("")
-            self.addNewPerson.setDisabled(True)
+            self.createNewPerson() 
+        else:
+            self.saveFace()
+        self.output.setText(personName + " has been Added!")
+        self.lineEdit.setDisabled(True)
+        self.lineEdit.setText("")
+        self.addNewPerson.setDisabled(True)
 
     def saveFace(self):
         listFiles = os.listdir("KnownImages/" + self.newFace.name)
-        if(len(listFiles) <= 3):
+        if(len(listFiles) <= 9):
             numpy.save("KnownImages/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
 
         
@@ -101,13 +105,19 @@ class Ui_MainWindow(QWidget):
 
             
     def detectFace(self):
-        self.newFace = Face("",self.filename)
-        name = self.newFace.findPerson()
+        self.thread = AThread()
+        self.thread.filename = self.filename
+        self.thread.finished.connect(self.detectFinish)
+        self.thread.start()
+        
+        
+    def detectFinish(self):
+        self.newFace = self.thread.newFace
         _translate = QtCore.QCoreApplication.translate
-        if name != "Unknown":
-            self.output.setText(_translate("MainWindow","This is " + name))
+        if self.thread.name != "Unknown":
+            self.output.setText(_translate("MainWindow","This is " + self.thread.name))
             self.saveFace()
-        elif name == "Unknown":
+        elif self.thread.name == "Unknown":
             self.output.setText(_translate("MainWindow","Person Unknown \nClick button below to add new person"))
             self.addNewPerson.setDisabled(False)
             self.lineEdit.setDisabled(False)
@@ -122,8 +132,16 @@ class Ui_MainWindow(QWidget):
         self.detectButton.setText(_translate("MainWindow", "Detect Face"))
         self.output.setText(_translate("MainWindow", "Person Name"))
         self.addNewPerson.setText(_translate("MainWindow", "Add"))
-        
 
+
+
+class AThread(QThread):
+    filename = ""
+    name = "Unknown"
+
+    def run(self):
+        self.newFace = Face("",self.filename)
+        self.name = self.newFace.findPerson()
     
 
 if __name__ == "__main__":

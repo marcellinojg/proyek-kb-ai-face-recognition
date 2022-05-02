@@ -23,13 +23,13 @@ class Face:
         
     def findEncode(self):
         self.location = face_recognition.face_locations(self.image)
-        self.encoding = face_recognition.face_encodings(self.image)[0]
+        self.encoding = face_recognition.face_encodings(self.image,num_jitters=10)[0]
         
     def findPerson(self):
         faces = KnownPeople()
         name = "Unknown"
         for i in range(0,len(faces.faces)):
-            isFound = face_recognition.compare_faces(faces.faces[i],self.encoding)
+            isFound = face_recognition.compare_faces(faces.faces[i],self.encoding,tolerance=0.4)
             if isFound[0]:
                 name = faces.peopleName[i]
                 self.name = name
