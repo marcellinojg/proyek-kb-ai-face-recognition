@@ -1,9 +1,8 @@
-from fileinput import filename
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog,QWidget
-from FaceRecognition import Face,KnownPeople
+from FaceRecognition import Face
+import numpy
 import os
-import shutil
 import sys
 
 class Ui_MainWindow(QWidget):
@@ -78,28 +77,36 @@ class Ui_MainWindow(QWidget):
     def confirmAdd(self):
         listPeople = os.listdir("KnownImages")
         personName = self.lineEdit.text()
+        self.newFace.name = personName
         print(listPeople)
         print(personName)
-        if not personName in listPeople:
-            os.mkdir("KnownImages/" + personName)
-            print("KnownImages/" + personName)
-            shutil.move(self.url,"KnownImages/" + personName)
+        if not personName in listPeople:    
+            self.createNewPerson()
             self.output.setText(personName + " has been Added!")
             self.lineEdit.setDisabled(True)
             self.lineEdit.setText("")
             self.addNewPerson.setDisabled(True)
 
-            
-      
+    def saveFace(self):
+        listFiles = os.listdir("KnownImages/" + self.newFace.name)
+        if(len(listFiles) <= 3):
+            numpy.save("KnownImages/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
+
+        
+        
+    def createNewPerson(self):
+        os.mkdir("KnownImages/" + self.newFace.name)
+        listFiles = os.listdir("KnownImages/" + self.newFace.name)
+        numpy.save("KnownImages/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
+
             
     def detectFace(self):
-        newFace = Face("",self.filename)
-
-        name = newFace.findPerson()
+        self.newFace = Face("",self.filename)
+        name = self.newFace.findPerson()
         _translate = QtCore.QCoreApplication.translate
         if name != "Unknown":
             self.output.setText(_translate("MainWindow","This is " + name))
-            shutil.move(self.url,"KnownImages/" + name)
+            self.saveFace()
         elif name == "Unknown":
             self.output.setText(_translate("MainWindow","Person Unknown \nClick button below to add new person"))
             self.addNewPerson.setDisabled(False)

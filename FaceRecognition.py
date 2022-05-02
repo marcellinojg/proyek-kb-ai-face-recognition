@@ -1,6 +1,7 @@
 from email.mime import image
 import face_recognition
 import os
+import numpy
 
 
 class Face:
@@ -14,13 +15,7 @@ class Face:
         self.name = name
         self.url = url
         self.loadLocalImage(self.url)
-        self.findEncode()
-        
-    
-    # def loadUploadedImage(self,url):
-    #     self.image = face_recognition.load_image_file(url)
-    #     self.url = url
-        
+        self.findEncode()     
         
     def loadLocalImage(self,url):
         self.image = face_recognition.load_image_file(url)
@@ -34,9 +29,9 @@ class Face:
         faces = KnownPeople()
         name = "Unknown"
         for i in range(0,len(faces.faces)):
-            isFound = face_recognition.compare_faces([faces.faces[i].encoding],self.encoding)
+            isFound = face_recognition.compare_faces(faces.faces[i],self.encoding)
             if isFound[0]:
-                name = faces.faces[i].name
+                name = faces.peopleName[i]
                 self.name = name
                 break
         
@@ -47,17 +42,23 @@ class Face:
     
 class KnownPeople:
     faces = []
+    peopleName = []
     folder_names = []
     
     def __init__(self):
         self.folder_names = os.listdir("KnownImages")
         self.addFaces()
-        
+    
     def addFaces(self):
-        for i in range(0,len(self.folder_names)):
-            image_names = os.listdir("KnownImages/" + self.folder_names[i])
-            for j in range(0,len(image_names)):
-                self.faces.append(Face(self.folder_names[i],"KnownImages/" + self.folder_names[i] + "/" + image_names[j]))
+        for people in self.folder_names:
+            dataList = os.listdir("KnownImages/" + people)
+            self.peopleName.append(people)
+            tempArr = []
+            for data in dataList:
+                tempArr1 = numpy.load("KnownImages/" + people + "/" + data)
+                tempArr.append(tempArr1)
+            self.faces.append(tempArr)
+                
     
 if __name__ == "__main__":
     listFaces = KnownPeople()
