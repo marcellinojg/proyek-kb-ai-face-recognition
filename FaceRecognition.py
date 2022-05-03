@@ -46,16 +46,16 @@ class KnownPeople:
     folder_names = []
     
     def __init__(self):
-        self.folder_names = os.listdir("KnownImages")
+        self.folder_names = os.listdir("Data")
         self.addFaces()
     
     def addFaces(self):
         for people in self.folder_names:
-            dataList = os.listdir("KnownImages/" + people)
+            dataList = os.listdir("Data/" + people)
             self.peopleName.append(people)
             tempArr = []
             for data in dataList:
-                tempArr1 = numpy.load("KnownImages/" + people + "/" + data)
+                tempArr1 = numpy.load("Data/" + people + "/" + data)
                 tempArr.append(tempArr1)
             self.faces.append(tempArr)
                 

@@ -20,7 +20,7 @@ class Ui_MainWindow(QWidget):
         self.gridLayout.setObjectName("gridLayout")
         self.imageToFind = QtWidgets.QLabel(self.centralwidget)
         self.imageToFind.setText("")
-        self.imageToFind.setPixmap(QtGui.QPixmap("E:\\Kuliah\\Semester 4\\KB\\yourimagehere.png"))
+        self.imageToFind.setPixmap(QtGui.QPixmap("Asset/yourimagehere.png"))
         self.imageToFind.setScaledContents(True)
         self.imageToFind.setAlignment(QtCore.Qt.AlignCenter)
         self.imageToFind.setWordWrap(False)
@@ -77,7 +77,7 @@ class Ui_MainWindow(QWidget):
             self.url = fileName
             
     def confirmAdd(self):
-        listPeople = os.listdir("KnownImages")
+        listPeople = os.listdir("Data")
         personName = self.lineEdit.text()
         self.newFace.name = personName
         print(listPeople)
@@ -92,16 +92,16 @@ class Ui_MainWindow(QWidget):
         self.addNewPerson.setDisabled(True)
 
     def saveFace(self):
-        listFiles = os.listdir("KnownImages/" + self.newFace.name)
+        listFiles = os.listdir("Data/" + self.newFace.name)
         if(len(listFiles) <= 9):
-            numpy.save("KnownImages/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
+            numpy.save("Data/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
 
         
         
     def createNewPerson(self):
-        os.mkdir("KnownImages/" + self.newFace.name)
-        listFiles = os.listdir("KnownImages/" + self.newFace.name)
-        numpy.save("KnownImages/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
+        os.mkdir("Data/" + self.newFace.name)
+        listFiles = os.listdir("Data/" + self.newFace.name)
+        numpy.save("Data/"+ self.newFace.name+ "/" + self.newFace.name + str(len(listFiles) + 1),self.newFace.encoding)
 
             
     def detectFace(self):
