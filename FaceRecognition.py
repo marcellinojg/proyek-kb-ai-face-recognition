@@ -10,6 +10,7 @@ class Face:
     location = None
     encoding = None
     url = None
+    result = False
     
     def __init__(self,name,url):
         self.name = name
@@ -23,7 +24,11 @@ class Face:
         
     def findEncode(self):
         self.location = face_recognition.face_locations(self.image)
-        self.encoding = face_recognition.face_encodings(self.image,num_jitters=10)[0]
+        if len(self.location) != 0:
+            self.encoding = face_recognition.face_encodings(self.image,num_jitters=10)[0]
+            self.result = True
+        else:
+            self.result = False
         
     def findPerson(self):
         faces = KnownPeople()
@@ -58,13 +63,3 @@ class KnownPeople:
                 tempArr1 = numpy.load("Data/" + people + "/" + data)
                 tempArr.append(tempArr1)
             self.faces.append(tempArr)
-                
-    
-if __name__ == "__main__":
-    listFaces = KnownPeople()
-    testElon = Face("","testelon1.jpg")
-    testBill = Face("","testbill1.jpg")
-    testMark = Face("","testmark1.jpg")
-    testElon.findPerson()
-    testBill.findPerson()
-    testMark.findPerson()
